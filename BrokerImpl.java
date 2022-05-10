@@ -27,11 +27,18 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker {
     public String executeInstruction(String instrName, List<String> parameters) {
         String instruction = null;
         try {
-            
+            switch(instrName){
+                case "getTimeString":
+                    instruction = server.getTimeString();
+                    break;
+                default:
+                    instruction = "Instruction not found";
+                    break;
+            }
         } catch (final Exception ex) {
             System.out.println(ex);
         }
-        return null;
+        return instruction;
     }
 
     public static void main(final String args[]) {
@@ -40,16 +47,14 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker {
       
         System.setSecurityManager(new SecurityManager());
 
-        String brokerIP = "192.168.56.1";
+        String brokerHostName = "155.210.154.192:32000";
 
         try {
-            // Crear objeto remoto
+            // run the broker
             BrokerImpl broker = new BrokerImpl();
-            System.out.println("Creado!");
-
-            Naming.rebind("//" + brokerIP +"/MyBroker", broker);
-
-            System.out.println("Estoy registrado!");
+            System.out.println("Broker is running...");
+            Naming.rebind("//" + brokerHostName +"/MyBroker", broker);
+            System.out.println("Broker is ready !");
 
         }
         catch (final Exception ex){
