@@ -8,15 +8,16 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker {
         super();
         
     }
-    private Server651 server;
+    private Server server;
     private String serverIP;
     private String serverName;
     
-    public void addServer(String name, String IP ){
+    public void addServer(Server srv, String IP ){
+        
         try {
-            serverIP = IP;
-            serverName= name;
-            server = (Server651) Naming.lookup("//" + serverIP + "/" + serverName);
+            serverIP = srv.IP_port;
+            serverName= srv.name;
+            server = (Server) Naming.lookup("//" + serverIP + "/" + serverName);
         }
         catch(final Exception ex) {
             System.out.println(ex);
@@ -29,7 +30,7 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker {
         try {
             switch(instrName){
                 case "getTimeString":
-                    instruction = server.getTimeString();
+                    instruction = Server651Impl.getTimeString();
                     break;
                 default:
                     instruction = "Instruction not found";
@@ -61,4 +62,11 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker {
             System.out.println(ex);
         }
     }
+
+    @Override
+    public void addServices(Server serverName, List<String> services) throws RemoteException {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

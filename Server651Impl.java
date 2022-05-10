@@ -4,16 +4,18 @@ import java.rmi.RemoteException;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 
-public class Server651Impl extends UnicastRemoteObject implements Server651 {
+public class Server651Impl extends UnicastRemoteObject implements Server {
     private String IP_port; // server's IP and Port
+    private static String name; // server's name
 
-    protected Server651Impl(String address) throws RemoteException {
+    protected Server651Impl(String address, String name) throws RemoteException {
         super();
         this.IP_port = address;
+        this.name = name;
     }
 
-    @Override
-    public String getTimeString() throws RemoteException {
+    
+    public static String getTimeString() throws RemoteException {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
         return dtf.format(now);
@@ -26,14 +28,14 @@ public class Server651Impl extends UnicastRemoteObject implements Server651 {
         try {
 
             // run the server
-            Server651Impl srv = new Server651Impl(serverHostName);
+            Server651Impl srv = new Server651Impl(serverHostName, "Server651");
             System.out.println("Server 651 is running...");
             Naming.rebind("//" + serverHostName + "/MyServer651", srv);
             System.out.println("Server 651 is ready !");
 
             // connect to the broker
             Broker broker = (Broker) Naming.lookup("//" + brokerHostName + "/MyBroker");
-            broker.addServer("MyServer651", serverHostName);
+            broker.addServer(srv, serverHostName);
         } catch (Exception ex) {
             System.out.println(ex);
         }

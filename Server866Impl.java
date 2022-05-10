@@ -1,18 +1,20 @@
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-public class Server866Impl extends UnicastRemoteObject implements Server866 {
-    private String IP_port; // server's IP and Port -> "IP:Port"
-
-    protected Server866Impl(String address, String port) throws RemoteException {
+public class Server866Impl extends UnicastRemoteObject implements Server {
+    private String IP_port; // server's IP and Port
+    private static String name; // server's name
+    
+    protected Server866Impl(String address, String name) throws RemoteException {
         super();
-        this.IP_port = address;
+        IP_port = address;
+        name=name;
     }
-    @Override
     public String getNumberOfStudents() throws RemoteException {
         return "Number of EINA students: almost 4500";
         
     }
+
 
 
     
