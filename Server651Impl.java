@@ -1,12 +1,12 @@
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
-import java.time.format.DateTimeFormatter;  
-import java.time.LocalDateTime;   
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 
 public class Server651Impl extends UnicastRemoteObject implements Server651 {
     private String IP_port; // server's IP and Port
-   
+
     protected Server651Impl(String address) throws RemoteException {
         super();
         this.IP_port = address;
@@ -18,9 +18,9 @@ public class Server651Impl extends UnicastRemoteObject implements Server651 {
         LocalDateTime now = LocalDateTime.now();
         return dtf.format(now);
     }
-    public static void main(String args[]){
+
+    public static void main(String args[]) {
         System.setProperty("java.security.policy", "./java.policy");
-        System.setSecurityManager(new SecurityManager());
         String brokerHostName = "155.210.154.192:32000"; // broker IP and Port
         String serverHostName = "155.210.154.193:32000"; // server IP and Port
         try {
@@ -28,15 +28,14 @@ public class Server651Impl extends UnicastRemoteObject implements Server651 {
             // run the server
             Server651Impl srv = new Server651Impl(serverHostName);
             System.out.println("Server 651 is running...");
-            Naming.rebind("//" + serverHostName + "/MyServer651", srv); 
+            Naming.rebind("//" + serverHostName + "/MyServer651", srv);
             System.out.println("Server 651 is ready !");
-            
+
             // connect to the broker
-            Broker broker = (Broker) Naming.lookup("//"+ brokerHostName + "/MyBroker");
-            broker.addServer("MyServer651", brokerHostName);
-        }
-        catch (Exception ex){
+            Broker broker = (Broker) Naming.lookup("//" + brokerHostName + "/MyBroker");
+            broker.addServer("MyServer651", serverHostName);
+        } catch (Exception ex) {
             System.out.println(ex);
         }
-        }
     }
+}
