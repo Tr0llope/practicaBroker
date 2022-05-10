@@ -9,7 +9,7 @@ public interface Broker extends Remote {
     void addServer(String serverName, String hostname) throws RemoteException;
     
     //API para los clientes:
-    String executeInstruction(String instrName, List<String> parameters);
+    String executeInstruction(String instrName, List<String> parameters) throws RemoteException;
 
 }
     
