@@ -1,52 +1,14 @@
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class BrokerImpl extends UnicastRemoteObject implements Broker {
-    protected BrokerImpl() throws RemoteException {
-        super();
-        
-    }
-    private Server server;
-    private String serverIP;
-    private String serverName;
-    
-    public void addServer(Server srv, String IP ){
-        
-        try {
-            serverIP = srv.IP_port;
-            serverName= srv.name;
-            server = (Server) Naming.lookup("//" + serverIP + "/" + serverName);
-        }
-        catch(final Exception ex) {
-            System.out.println(ex);
-        }
-    }
-
-    @Override
-    public String executeInstruction(String instrName, List<String> parameters) {
-        String instruction = null;
-        try {
-            switch(instrName){
-                case "getTimeString":
-                    instruction = Server651Impl.getTimeString();
-                    break;
-                default:
-                    instruction = "Instruction not found";
-                    break;
-            }
-        } catch (final Exception ex) {
-            System.out.println(ex);
-        }
-        return instruction;
-    }
-
     public static void main(final String args[]) {
 
         System.setProperty("java.security.policy", "./java.policy");
-      
-        System.setSecurityManager(new SecurityManager());
 
         String brokerHostName = "155.210.154.192:32000";
 
@@ -54,19 +16,81 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker {
             // run the broker
             BrokerImpl broker = new BrokerImpl();
             System.out.println("Broker is running...");
-            Naming.rebind("//" + brokerHostName +"/MyBroker", broker);
+            Naming.rebind("//" + brokerHostName + "/MyBroker", broker);
             System.out.println("Broker is ready !");
 
+        } catch (final Exception ex) {
+            System.out.println(ex);
         }
-        catch (final Exception ex){
+    }
+
+    private ArrayList<Server> servers;
+
+    private String serverIP;
+    private String serverName;
+
+    protected BrokerImpl() throws RemoteException {
+        super();
+
+    }
+
+    public void addServer(String srv, String IP) throws RemoteException {
+        try {
+            serverName = srv;
+            serverIP = IP;
+            servers.add(new Server(srv, IP));
+        } catch (final Exception ex) {
             System.out.println(ex);
         }
     }
 
     @Override
-    public void addServices(Server serverName, List<String> services) throws RemoteException {
-        // TODO Auto-generated method stub
-        
+    public Object executeInstruction(String instrName, Object... params) throws RemoteException {
+        try {
+            String serverName = null;
+            for (String server : services.keySet()) {
+                for (String server_service : services.get(server)) {
+                    if (server_service == instrName) {
+                        serverName = server;
+                    }
+                }
+            }
+            if (serverName == null) {
+                throw new Exception("Method not found");
+            } else {
+                Server server = (Server) Naming.lookup("//" + serverIP + "/" + serverName);
+                return server.executeService(instrName, params);
+            }
+        } catch (final Exception ex) {
+            System.out.println(ex);
+        }
+        return null;
+    }
+
+    @Override
+    public void alta_servicio(String serverName, String serviceName, Class<?> returnType, Class<?>... paramTypes)
+            throws RemoteException {
+        services.get(serverName).add(serviceName);
+    }
+
+    @Override
+    public void baja_servicio(String serverName, String serviceName) throws RemoteException {
+        for (Server server : servers) {
+            if (server) {
+                services.get(serverName).remove(service);
+            }
+        }
+    }
+
+    @Override
+    public String getServices() throws RemoteException {
+        ArrayList<String> allServices = new ArrayList<>();
+        for (String server : services.keySet()) {
+            for (String server_service : services.get(server)) {
+                allServices.add(server_service);
+            }
+        }
+        return allServices;
     }
 
 }

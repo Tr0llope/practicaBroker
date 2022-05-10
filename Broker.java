@@ -1,21 +1,56 @@
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.List;
-
+import java.util.HashMap;
 
 public interface Broker extends Remote {
 
-    //API para los servidores:
-    void addServer(Server serverName, String hostname) throws RemoteException;
+    public class Server {
+        public class Service {
+            private Class<?>[] paramTypes;
+            private Class<?> returnType;
 
-    void addServices(Server serverName, List<String> services) throws RemoteException;
+        }
 
+        private String serverIP;
+        private String serverName;
+        private HashMap<String, Service> services;
 
-    
-    //API para los clientes:
-    String executeInstruction(String instrName, List<String> parameters) throws RemoteException;
+        Server(String name, String IP) {
+            serverIP = IP;
+            serverName = name;
+        }
 
+        public String getName() {
+            return serverName;
+        }
 
+        public String getIP() {
+            return serverIP;
+        }
 
+        public void addService(String serviceName, Class<?> returnType, Class<?>... paramTypes) {
+            return serverIP;
+        }
+
+        public void removeService(String serviceName) {
+            return serverIP;
+        }
+
+        public String getServices() {
+
+        }
+    }
+
+    // API para los servidores:
+    void addServer(String serverName, String hostname) throws RemoteException;
+
+    void alta_servicio(String serverName, String serviceName, Class<?> returnType, Class<?>... paramTypes)
+            throws RemoteException;
+
+    void baja_servicio(String serverName, String serviceName) throws RemoteException;
+
+    // API para los clientes:
+    String getServices() throws RemoteException;
+
+    Object executeInstruction(String instrName, Object... params) throws RemoteException;
 }
-    
