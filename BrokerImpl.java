@@ -23,36 +23,28 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker {
         }
     }
 
-    private ArrayList<Server> servers;
+    private HashMap<String, Server> servers;
     private HashMap<String, String> services;
+    private HashMap<String, Class<?>[]> servicesParams;
+    private HashMap<String, Class<?>> servicesReturnType;
 
     protected BrokerImpl() throws RemoteException {
         super();
-        servers = new ArrayList<>();
+        servers = new HashMap<>();
         services = new HashMap<>();
+        servicesParams = new HashMap<>();
+        servicesReturnType = new HashMap<>();
     }
 
     public void addServer(String RMIName, String hostname)
             throws RemoteException, MalformedURLException, NotBoundException {
-        servers.add((Server) Naming.lookup("//" + hostname + "/" + RMIName));
+        servers.put(RMIName, (Server) Naming.lookup("//" + hostname + "/" + RMIName));
         System.out.println(hostname + "/" + RMIName);
     }
 
     @Override
     public Object executeService(String svcName, Object... params) throws RemoteException, Exception {
-        Server serviceProvider = null;
-        Server serverTmp = null;
-        try {
-            for (Server server : servers) {
-                serverTmp = server;
-                if (server.getServices().contains(svcName)) {
-                    serviceProvider = server;
-                }
-            }
-        } catch (RemoteException e) {
-            servers.remove(serverTmp);
-            services.remove(svcName);
-        }
+        Server serviceProvider = servers.get(services.get(svcName));
         if (serviceProvider == null) {
             throw new Exception("No server found that provides such service");
         }
@@ -62,9 +54,11 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker {
     @Override
     public void alta_servicio(String serverName, String serviceName, Class<?> returnType, Class<?>... paramTypes)
             throws RemoteException {
-        String service = String.format("%s\t%s\t%s", serverName, serviceName, returnType.getCanonicalName());
-        System.out.println("Registered service: " + service);
-        services.put(serviceName, service);
+        services.put(serviceName, serverName);
+        servicesParams.put(serviceName, paramTypes);
+        servicesReturnType.put(serviceName, returnType);
+        System.out.println("Registered service: "
+                + String.format("%s\t%s\t%s", serverName, serviceName, returnType.getCanonicalName()));
     }
 
     @Override
@@ -77,17 +71,23 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker {
     public ArrayList<String> getServices() throws RemoteException {
         // ArrayList<String> allServices = new ArrayList<>();
         // for (Server server : servers) {
+        // try {
         // for (String server_service : server.getServices()) {
         // System.out.println(server_service);
         // allServices.add(server_service);
         // }
+        // } catch (RemoteException e) {
+        // System.out.println(e);
+        // servers.remove(server);
+        // }
         // }
         // return allServices;
         ArrayList<String> allServices = new ArrayList<>();
-        for (String server_service : services.values()) {
-            allServices.add(server_service);
+        for (String serviceName : services.keySet()) {
+            allServices
+                    .add(String.format("%s\t%s\t%s", servers.get(services.get(serviceName)).getName(), serviceName,
+                            servicesReturnType.get(serviceName).getCanonicalName()));
         }
         return allServices;
     }
-
 }

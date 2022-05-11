@@ -43,10 +43,7 @@ public class ServerBImpl extends UnicastRemoteObject implements Server {
         // register services in broker
         System.out.println("Registering " + serverRMIName + " services");
 
-        services.add("getNumAlumnos");
         this.broker.alta_servicio(serverRMIName, "getNumAlumnos", Integer.class);
-
-        services.add("anyadirAlumnos");
         this.broker.alta_servicio(serverRMIName, "anyadirAlumnos", Void.class,
                 Integer.class);
     }

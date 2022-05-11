@@ -43,8 +43,9 @@ public class ServerAImpl extends UnicastRemoteObject implements Server {
 
         // register services in broker
         System.out.println("Registering " + serverRMIName + " services");
-        services.add("getTimeString");
         this.broker.alta_servicio(serverRMIName, "getTimeString", String.class);
+        this.broker.alta_servicio(serverRMIName, "prueba_alta_servicio", String.class);
+        this.broker.alta_servicio(serverRMIName, "prueba_baja_servicio", String.class);
     }
 
     public static String getTimeString() throws RemoteException {
@@ -72,5 +73,15 @@ public class ServerAImpl extends UnicastRemoteObject implements Server {
     @Override
     public String getIpPort() throws RemoteException {
         return this.IP_port;
+    }
+
+    public String prueba_alta_servicio() throws RemoteException {
+        this.broker.alta_servicio(serverRMIName, "getTimeString", String.class);
+        return "Dado de alta getTimeString";
+    }
+
+    public String prueba_baja_servicio() throws RemoteException {
+        this.broker.baja_servicio(serverRMIName, "getTimeString");
+        return "Dado de baja getTimeString";
     }
 }
