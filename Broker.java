@@ -5,8 +5,8 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 public interface Broker extends Remote {
-    static final String brokerHostName = "127.0.0.1:32000"; // broker IP and Port
-    static final String brokerRMIName = "MyBroker";
+    static final String brokerHostName = "155.210.154.191:32001"; // broker IP and Port
+    static final String brokerRMIName = "MyBroker441";
 
     // API para los servidores:
     void addServer(String serverName, String hostname) throws RemoteException, MalformedURLException, NotBoundException;

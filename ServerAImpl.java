@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 
 public class ServerAImpl extends UnicastRemoteObject implements Server {
 
-    private static final String serverHostName = "127.0.0.1:32001"; // server IP and Port
-    private static final String serverRMIName = "ServerA";
+    private static final String serverHostName = "155.210.154.192:32002"; // server IP and Port
+    private static final String serverRMIName = "ServerA441";
 
     public static void main(String args[]) throws RemoteException, MalformedURLException, NotBoundException {
         System.setProperty("java.security.policy", "./java.policy");

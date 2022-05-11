@@ -69,19 +69,6 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker {
 
     @Override
     public ArrayList<String> getServices() throws RemoteException {
-        // ArrayList<String> allServices = new ArrayList<>();
-        // for (Server server : servers) {
-        // try {
-        // for (String server_service : server.getServices()) {
-        // System.out.println(server_service);
-        // allServices.add(server_service);
-        // }
-        // } catch (RemoteException e) {
-        // System.out.println(e);
-        // servers.remove(server);
-        // }
-        // }
-        // return allServices;
         ArrayList<String> allServices = new ArrayList<>();
         for (String serviceName : services.keySet()) {
             allServices

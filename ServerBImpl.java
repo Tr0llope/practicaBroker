@@ -8,8 +8,8 @@ import java.util.ArrayList;
 
 public class ServerBImpl extends UnicastRemoteObject implements Server {
 
-    private static final String serverHostName = "127.0.0.1:32002"; // server IP and Port
-    private static final String serverRMIName = "ServerB";
+    private static final String serverHostName = "155.210.154.196:32001"; // server IP and Port
+    private static final String serverRMIName = "ServerB441";
 
     public static void main(String args[]) throws RemoteException, MalformedURLException, NotBoundException {
         System.setProperty("java.security.policy", "./java.policy");

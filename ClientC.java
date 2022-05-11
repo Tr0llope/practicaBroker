@@ -2,8 +2,8 @@ import java.rmi.Naming;
 import java.util.Scanner;
 
 public class ClientC {
-    static final String brokerHostName = "127.0.0.1:32000"; // broker IP and Port
-    static final String brokerRMIName = "MyBroker";
+    static final String brokerHostName = "155.210.154.191:32001"; // broker IP and Port
+    static final String brokerRMIName = "MyBroker441";
 
     public static void main(String[] args) throws Exception {
         System.setProperty("java.security.policy", "./java.policy");
