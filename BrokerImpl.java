@@ -1,22 +1,21 @@
+import java.net.MalformedURLException;
 import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class BrokerImpl extends UnicastRemoteObject implements Broker {
     public static void main(final String args[]) {
 
         System.setProperty("java.security.policy", "./java.policy");
 
-        String brokerHostName = "155.210.154.192:32000";
-
         try {
             // run the broker
             BrokerImpl broker = new BrokerImpl();
             System.out.println("Broker is running...");
-            Naming.rebind("//" + brokerHostName + "/MyBroker", broker);
+            Naming.rebind("//" + brokerHostName + "/" + brokerRMIName, broker);
             System.out.println("Broker is ready !");
 
         } catch (final Exception ex) {
@@ -25,70 +24,68 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker {
     }
 
     private ArrayList<Server> servers;
-
-    private String serverIP;
-    private String serverName;
+    private HashMap<String, String> services;
 
     protected BrokerImpl() throws RemoteException {
         super();
-
+        servers = new ArrayList<>();
+        services = new HashMap<>();
     }
 
-    public void addServer(String srv, String IP) throws RemoteException {
-        try {
-            serverName = srv;
-            serverIP = IP;
-            servers.add(new Server(srv, IP));
-        } catch (final Exception ex) {
-            System.out.println(ex);
-        }
+    public void addServer(String RMIName, String hostname)
+            throws RemoteException, MalformedURLException, NotBoundException {
+        servers.add((Server) Naming.lookup("//" + hostname + "/" + RMIName));
+        System.out.println(hostname + "/" + RMIName);
     }
 
     @Override
-    public Object executeInstruction(String instrName, Object... params) throws RemoteException {
+    public Object executeService(String svcName, Object... params) throws RemoteException, Exception {
+        Server serviceProvider = null;
+        Server serverTmp = null;
         try {
-            String serverName = null;
-            for (String server : services.keySet()) {
-                for (String server_service : services.get(server)) {
-                    if (server_service == instrName) {
-                        serverName = server;
-                    }
+            for (Server server : servers) {
+                serverTmp = server;
+                if (server.getServices().contains(svcName)) {
+                    serviceProvider = server;
                 }
             }
-            if (serverName == null) {
-                throw new Exception("Method not found");
-            } else {
-                Server server = (Server) Naming.lookup("//" + serverIP + "/" + serverName);
-                return server.executeService(instrName, params);
-            }
-        } catch (final Exception ex) {
-            System.out.println(ex);
+        } catch (RemoteException e) {
+            servers.remove(serverTmp);
+            services.remove(svcName);
         }
-        return null;
+        if (serviceProvider == null) {
+            throw new Exception("No server found that provides such service");
+        }
+        return serviceProvider.executeService(svcName, params);
     }
 
     @Override
     public void alta_servicio(String serverName, String serviceName, Class<?> returnType, Class<?>... paramTypes)
             throws RemoteException {
-        services.get(serverName).add(serviceName);
+        String service = String.format("%s\t%s\t%s", serverName, serviceName, returnType.getCanonicalName());
+        System.out.println("Registered service: " + service);
+        services.put(serviceName, service);
     }
 
     @Override
     public void baja_servicio(String serverName, String serviceName) throws RemoteException {
-        for (Server server : servers) {
-            if (server) {
-                services.get(serverName).remove(service);
-            }
-        }
+        services.remove(serviceName);
+        System.out.println("Removed service: " + serviceName);
     }
 
     @Override
-    public String getServices() throws RemoteException {
+    public ArrayList<String> getServices() throws RemoteException {
+        // ArrayList<String> allServices = new ArrayList<>();
+        // for (Server server : servers) {
+        // for (String server_service : server.getServices()) {
+        // System.out.println(server_service);
+        // allServices.add(server_service);
+        // }
+        // }
+        // return allServices;
         ArrayList<String> allServices = new ArrayList<>();
-        for (String server : services.keySet()) {
-            for (String server_service : services.get(server)) {
-                allServices.add(server_service);
-            }
+        for (String server_service : services.values()) {
+            allServices.add(server_service);
         }
         return allServices;
     }

@@ -4,14 +4,13 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 public interface Server extends Remote {
-    public class Service {
-        public String name;
-        public ArrayList<Object> params;
-    }
 
-    String getName();
+    static final String brokerHostName = "127.0.0.1:32000"; // broker IP and Port
+    static final String brokerRMIName = "MyBroker";
 
-    String getIpPort();
+    String getName() throws RemoteException;
+
+    String getIpPort() throws RemoteException;
 
     ArrayList<String> getServices() throws RemoteException;
 
